@@ -1,0 +1,100 @@
+-- Count total records in dataset
+select count(*) from zepto_v2;  # Checked total number of records in dataset
+
+-- View complete dataset
+select * from zepto.zepto_v2;  # Previewed full dataset structure
+
+-- Check for NULL values in important columns
+select * from zepto.zepto_v2 
+where Category is null 
+or name is null 
+or mrp is null 
+or discountpercent is null
+or availableQuantity is null
+or discountedSellingPrice is null 
+or weightInGms is null 
+or outOfStock is null 
+or quantity is null;  # Identified missing values for data cleaning
+
+-- Get unique product categories
+select distinct category from zepto_v2
+order by Category;  # Listed all available categories
+
+-- Check stock availability count
+select outofstock , count(name) as availability_of_products
+from zepto_v2
+group by outOfStock;  # Analyzed stock distribution (in-stock vs out-of-stock)
+
+-- Check invalid records where MRP = 0
+select * from zepto_v2
+where mrp = 0 and discountPercent = 0;  # Found incorrect pricing data
+
+SET SQL_SAFE_UPDATES = 0;  # Disabled safe mode for updates/deletes
+
+delete from zepto_v2 where mrp = 0;  # Removed invalid MRP records
+
+-- Convert price from paise to rupees
+update zepto_v2
+set mrp = mrp/100.00 ,
+discountedsellingprice = discountedsellingprice/100.00;  
+# Standardized pricing format
+
+-- Top discounted products
+select distinct name, mrp, discountpercent 
+from zepto_v2 
+order by discountPercent desc limit 10;  
+# Identified highest discounted products
+
+-- High value out-of-stock products
+select distinct name, mrp 
+from zepto_v2 
+where outOfStock = TRUE and mrp > 10
+order by mrp desc;  
+# Found expensive products currently unavailable
+
+-- Category-wise total revenue
+select category , sum(discountedsellingprice * quantity) as total_revenue 
+from zepto_v2
+group by Category
+order by total_revenue;  
+# Calculated revenue contribution by each category
+
+-- High MRP but low discount products
+select distinct name , mrp , discountpercent 
+from zepto_v2
+where mrp > 500 and discountPercent < 10
+order by mrp desc , discountPercent desc;  
+# Identified premium products with low discounts
+
+-- Average discount by category
+select category,
+round(avg(discountpercent),2) as avg_discount
+from zepto_v2
+group by category
+order by avg_discount desc limit 6;  
+# Compared category-wise discount trends
+
+-- Price per gram analysis
+select distinct name, weightInGms , discountedsellingprice,
+round(discountedsellingprice/weightInGms,2) as price_per_gram
+from zepto_v2
+where weightInGms >= 100
+order by price_per_gram;  
+# Evaluated cost efficiency based on weight
+
+-- Weight segmentation
+select distinct name , weightInGms,
+case when weightInGms < 1000 then 'low'
+     when weightInGms < 5000 then 'medium'
+     else 'bulk'
+end as weight_category 
+from zepto_v2;  
+# Segmented products into low/medium/bulk categories
+
+-- Total inventory weight by category
+select category,
+sum(weightInGms * availablequantity) as total_weight
+from zepto_v2
+group by category
+order by total_weight;  
+# Measured inventory size per category

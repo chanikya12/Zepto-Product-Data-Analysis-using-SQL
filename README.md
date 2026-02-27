@@ -1,5 +1,8 @@
-# Zepto-Product-Data-Analysis-using-SQL
-This project focuses on performing data cleaning, transformation, and business analysis on the Zepto Product Dataset sourced from Kaggle.  The goal was to extract meaningful business insights related to pricing, discounts, stock availability, and revenue contribution using SQL.
+# 🛒 Zepto SQL Data Analysis Project
+
+![SQL](https://img.shields.io/badge/SQL-MySQL-blue)
+![Status](https://img.shields.io/badge/Project-Completed-brightgreen)
+![Level](https://img.shields.io/badge/Level-Beginner--Intermediate-orange)
 🗂 Dataset Information
 
 Source: Kaggle
